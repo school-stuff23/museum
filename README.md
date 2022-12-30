@@ -218,4 +218,3 @@ Use TDD to update your `Museum` class to add the following functionality:
 * When the Patron attends an `Exhibit`, the cost of the `Exhibit` should be subtracted from their `spending_money` and added to the `Museum` revenue.
 * A `Museum` should have a `patrons_of_exhibits` method that returns a Hash where the keys are the exhibits and the values are Arrays containing all the `Patrons` that attended that `Exhibit`.
 * A `Museum` should have a method `revenue` that returns an Integer representing the revenue collected from `Patrons` attending `Exhibits`.
-```
