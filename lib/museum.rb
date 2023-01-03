@@ -2,17 +2,20 @@ class Museum
   attr_reader :name,
               :exhibits,
               :patrons,
-              :revenue
+              :revenue,
+              :patrons_of_exhibits
 
   def initialize(name)
     @name = name 
     @exhibits = []
     @patrons = []
     @revenue = 0
+    @patrons_of_exhibits = Hash.new { |h, k| h[k] = [] }
   end
 
   def add_exhibit(exhibit)
-    @exhibits << exhibit 
+    @exhibits << exhibit
+    # patrons_of_exhibits[exhibit] = []
   end
 
   def recommend_exhibits(patron)
@@ -22,7 +25,21 @@ class Museum
   end
 
   def admit(patron)
-    @patrons << patron 
+    @patrons << patron
+
+    recommended_exhibits_by_price = recommend_exhibits(patron).sort_by(&:cost).reverse
+
+    recommended_exhibits_by_price.each do |exhibit|
+      # visited = []
+
+      if patron.spending_money >= exhibit.cost
+        # visited << patron 
+        # @patrons_of_exhibits[exhibit] += visited
+        @patrons_of_exhibits[exhibit] << patron
+        patron.spending_money -= exhibit.cost
+        @revenue += exhibit.cost
+      end
+    end
   end
 
   def patrons_by_exhibit_interest
@@ -79,27 +96,27 @@ class Museum
   #   end
   # end
   
-  def patrons_of_exhibits
-    exhibit_visitors = {}
+  # def patrons_of_exhibits
+  #   exhibit_visitors = {}
 
-    sorted = patrons_by_exhibit_interest.sort_by { |k, v| -k.cost }
+  #   sorted = patrons_by_exhibit_interest.sort_by { |k, v| -k.cost }
 
-    sorted.each do |pair|
-      exhibit = pair[0]
-      patrons = pair[1]
+  #   sorted.each do |pair|
+  #     exhibit = pair[0]
+  #     patrons = pair[1]
       
-      exhibit_visitors[exhibit] = []
+  #     exhibit_visitors[exhibit] = []
       
-      patrons.each do |patron|
-        if patron.spending_money >= exhibit.cost
-          exhibit_visitors[exhibit] << patron
+  #     patrons.each do |patron|
+  #       if patron.spending_money >= exhibit.cost
+  #         exhibit_visitors[exhibit] << patron
 
-          patron.spending_money -= exhibit.cost
-          @revenue += exhibit.cost
-        end
-      end
-    end
+  #         patron.spending_money -= exhibit.cost
+  #         @revenue += exhibit.cost
+  #       end
+  #     end
+  #   end
     
-    exhibit_visitors
-  end
+  #   exhibit_visitors
+  # end
 end
