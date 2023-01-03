@@ -15,7 +15,6 @@ class Museum
 
   def add_exhibit(exhibit)
     @exhibits << exhibit
-    # patrons_of_exhibits[exhibit] = []
   end
 
   def recommend_exhibits(patron)
@@ -27,34 +26,47 @@ class Museum
   def admit(patron)
     @patrons << patron
 
-    recommended_exhibits_by_price = recommend_exhibits(patron).sort_by(&:cost).reverse
+    # Loop through the exhibits Array
+    @exhibits.each do |exhibit|
+      # If the @patrons_of_exhibits (from initialize) with the key of <exhibit> is empty
+      if @patrons_of_exhibits[exhibit].empty?
+        # Keep it empty
+        @patrons_of_exhibits[exhibit] = []
+      end
 
-    recommended_exhibits_by_price.each do |exhibit|
-      # visited = []
+      # Else do nothing because it already has visitors and we don't want to clear it out
+    end
 
+    ##################
+    
+    # Loop through the recommended exhibits (note: they are in descending order by price)
+    recommend_exhibits_by_cost(patron).each do |exhibit|
+      # If the patron has enough money
       if patron.spending_money >= exhibit.cost
-        # visited << patron 
-        # @patrons_of_exhibits[exhibit] += visited
+        # Add the patron to the hash <exhibit> key visitors array (ie. { gems_and_minerals => [] })
         @patrons_of_exhibits[exhibit] << patron
+        # Reduce their spending money by the exhibit cost
         patron.spending_money -= exhibit.cost
+        # Add the exhibit cost to the Museum revenue
         @revenue += exhibit.cost
       end
     end
   end
 
+  def recommend_exhibits_by_cost(patron)
+    recommend_exhibits(patron).sort_by do |exhibit|
+      exhibit.cost
+    end.reverse
+  end
+
   def patrons_by_exhibit_interest
-    @exhibits.reduce({}) do |hash, exhibit|
-      hash[exhibit] = interested_patrons_for(exhibit)
-      hash
+    by_interest = {}
+
+    @exhibits.each do |exhibit|
+      by_interest[exhibit] = interested_patrons_for(exhibit)
     end
-
-    # by_interest = {}
-
-    # @exhibits.each do |exhibit|
-    #   by_interest[exhibit] = interested_patrons(exhibit)
-    # end
     
-    # by_interest
+    by_interest
   end
 
   def interested_patrons_for(exhibit)
@@ -83,40 +95,4 @@ class Museum
       "No winners for this lottery" :
       "#{winner} has won the #{exhibit.name} exhibit lottery"
   end
-
-  # def attend_exhibits(patron)
-  #   recommended_exhibits = recommend_exhibits(patron).sort_by(&:cost).reverse
-  #   require 'pry'; binding.pry
-    
-  #   recommended_exhibits.each do |e|
-  #     if patron.spending_money >= e.cost
-  #       @revenue += e.cost
-  #       patron.spending_money -= e.cost
-  #     end
-  #   end
-  # end
-  
-  # def patrons_of_exhibits
-  #   exhibit_visitors = {}
-
-  #   sorted = patrons_by_exhibit_interest.sort_by { |k, v| -k.cost }
-
-  #   sorted.each do |pair|
-  #     exhibit = pair[0]
-  #     patrons = pair[1]
-      
-  #     exhibit_visitors[exhibit] = []
-      
-  #     patrons.each do |patron|
-  #       if patron.spending_money >= exhibit.cost
-  #         exhibit_visitors[exhibit] << patron
-
-  #         patron.spending_money -= exhibit.cost
-  #         @revenue += exhibit.cost
-  #       end
-  #     end
-  #   end
-    
-  #   exhibit_visitors
-  # end
 end
